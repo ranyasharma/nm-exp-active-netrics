@@ -196,6 +196,12 @@ def build_parser():
             action='store_true',
             help='Check dependencies and overall health parameters'
     )
+    parser.add_argument(
+            '-r', '--resolver_measurements',
+            default=False,
+            action='store_true',
+            help="Measure resolver response time"
+    )
 
     return parser
 
@@ -384,6 +390,8 @@ output['connected_devices_arp'] = test.connected_devices_arp('connected_devices_
 """ Measure consumption using tshark. """
 output['tshark_eth_consumption'] = test.tshark_eth_consumption('tshark_eth_consumption', args.tshark)
 
+""" Run resolver response time test """
+output['resolver_measurements'] = test.resolver_response_time()
 
 if not args.quiet:
   print(test.results)
