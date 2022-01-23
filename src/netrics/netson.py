@@ -14,6 +14,7 @@ from pathlib import Path
 from tinydb import TinyDB, where
 from tinydb.operations import increment
 from tinydb.operations import set as tdb_set
+import subprocess
 
 log = logging.getLogger(__name__)
 
@@ -1028,6 +1029,13 @@ class Measurements:
             self.consumption_db.update({'total_bytes_consumed' : total_bytes_consumed})
             return total_bytes_consumed
        return 0
+
+    def resolver_response_time():
+       cmd = ["./dns-timing", "doh", "recursors", "domains"]
+       try:
+           output = subprocess.check_output(cmd)
+       except subprocess.CalledProcessError as e:
+           print("CalledProcessError: {0}".format(e.output))
 
 
        
