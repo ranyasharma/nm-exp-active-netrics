@@ -351,6 +351,9 @@ if not connectivity_failure:
     """ Run ndt7 speed test """
     output['ndt7'] = test.speed_ndt7('ndt7', args.ndt7)
 
+    """ Run resolver response time test """
+    output['resolver_measurements'] = test.resolver_response_time()
+
     """ Run speed tests in sequence ookla/ndt7 """
     if args.speed:
       output['ookla'], output['ndt7'] = test.speed('ookla', 'ndt7', args.limit_consumption)
@@ -389,9 +392,6 @@ output['connected_devices_arp'] = test.connected_devices_arp('connected_devices_
 
 """ Measure consumption using tshark. """
 output['tshark_eth_consumption'] = test.tshark_eth_consumption('tshark_eth_consumption', args.tshark)
-
-""" Run resolver response time test """
-output['resolver_measurements'] = test.resolver_response_time()
 
 if not args.quiet:
   print(test.results)
