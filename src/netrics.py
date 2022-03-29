@@ -352,8 +352,9 @@ if not connectivity_failure:
     output['ndt7'] = test.speed_ndt7('ndt7', args.ndt7)
 
     """ Run resolver response time test """
-    output['resolver_measurements'] = test.resolver_response_time()
-
+    if args.resolver_measurements:
+#      output['resolver_measurements'] = test.resolver_response_time('./dns-timing', "doh", "recursors", "domains", args.limit_consumption)
+      output['resolver_measurements'] = test.resolver_response_time('resolver_response_time', args.limit_consumption)
     """ Run speed tests in sequence ookla/ndt7 """
     if args.speed:
       output['ookla'], output['ndt7'] = test.speed('ookla', 'ndt7', args.limit_consumption)
