@@ -13,6 +13,7 @@ import os, sys, logging, traceback
 from pathlib import Path
 from tinydb import TinyDB, where
 from tinydb.operations import increment
+##from ping import ping
 from tinydb.operations import set as tdb_set
 import subprocess
 
@@ -1031,11 +1032,10 @@ class Measurements:
        return 0
 
     def resolver_response_time(self, key, run_test):
-#       if not run_test:
-#           return
-       all_dns_info = []
+#       all_dns_info = []
+       all_dns_info = {}
        k = 0
-       loop = 2
+       loop = 1
        localtime = time.strftime("%Y%m%d-%H%M%S")
        a = "data_" + str(loop) + "_" + localtime + ".json"
        print(a)
@@ -1060,44 +1060,64 @@ class Measurements:
                        ping_name = temp.replace("/dns-query", "")
                        try:
                            d = ping(ping_name, unit='ms')
-                           all_dns_info.append({
-                               'status': status,
-                               'resolver': resolver,
-                               'domain': domain,
-                               'rtime': response_time,
-                               'size_or_error': response_size,
-                               'ping_time': d,
-                               'datetime': datetime})
+                        #   all_dns_info.append({
+                         #      'status': status,
+                          #     'resolver': resolver,
+                           #    'domain': domain,
+                            #   'rtime': response_time,
+                             #  'size_or_error': response_size,
+                              # 'ping_time': d,
+                               #'datetime': datetime})
+                           all_dns_info["status"] = status
+                           all_dns_info["resolver"] = resolver
+                           all_dns_info["domain"] = domain
+                           all_dns_info["rtime"] = response_time
+                           all_dns_info["size_or_error"] = response_size
+                           all_dns_info["ping_time"] = d
+                           all_dns_info["datetime"] = datetime
+ 
                        except Exception as e:
                            d = None
-                           all_dns_info.append({
-                               'status': status,
-                               'resolver': resolver,
-                               'domain': domain,
-                               'rtime': response_time,
-                               'size_or_error': response_size,
-                               'ping_time': d,
-                               'datetime': datetime})
+                           #all_dns_info.append({
+                            #   'status': status,
+                            #   'resolver': resolver,
+                            #   'domain': domain,
+                            #   'rtime': response_time,
+                            #   'size_or_error': response_size,
+                            #   'ping_time': d,
+                            #   'datetime': datetime})
+                           all_dns_info["status"] = status
+                           all_dns_info["resolver"] = resolver
+                           all_dns_info["domain"] = domain
+                           all_dns_info["rtime"] = response_time
+                           all_dns_info["size_or_error"] = response_size
+                           all_dns_info["ping_time"] = d
+                           all_dns_info["datetime"] = datetime
                    else:
                        response_size = None
                        error = int(size_or_error)
                        response_time = None
                        d = None
-                       all_dns_info.append({
-                           'status': status,
-                           'resolver': resolver,
-                           'domain': domain,
-                           'rtime': response_time,
-                           'size_or_error': error,
-                           'ping_time': d,
-                           'datetime': datetime})
- #      try:
-#           output = subprocess.check_output(cmd)
+                       #all_dns_info.append({
+                        #   'status': status,
+                        #   'resolver': resolver,
+                        #   'domain': domain,
+                        #   'rtime': response_time,
+                        #   'size_or_error': error,
+                        #   'ping_time': d,
+                        #   'datetime': datetime})
+                       all_dns_info["status"] = status
+                       all_dns_info["resolver"] = resolver
+                       all_dns_info["domain"] = domain
+                       all_dns_info["rtime"] = response_time
+                       all_dns_info["size_or_error"] = response_size
+                       all_dns_info["ping_time"] = d
+                       all_dns_info["datetime"] = datetime
            except subprocess.CalledProcessError as e:
                print("CalledProcessError: {0}".format(e.output))
            except Exception as e:
                print("Exception: {0}".format(e))
            k = k + 1
+       self.results['resolver_measurements'] = all_dns_info
+       return output
        print(all_dns_info)
-##       with open("test.json", "w") as outfile:
-  ##         json.dump(all_dns_info, outfile)
