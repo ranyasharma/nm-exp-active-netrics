@@ -1076,10 +1076,12 @@ class Measurements:
                            ##all_dns_info["size_or_error"].append(response_size)
                            ##all_dns_info["ping_time"].append(d)
                            ##all_dns_info["datetime"].append(datetime)
-                           rtime_key = resolver + "_" + domain + "_" + rtime
-                           rsize_key = resolver + "_" + domain + "_" + size_or_error 
-                           all_dns_info[rtime_key] = response_time
-                           all_dns_info[rsize_key] = response_size
+                           ##rtime_key = resolver + "_" + domain + "_" + rtime
+                           ##rsize_key = resolver + "_" + domain + "_" + size_or_error
+                           rtime_key = f'{resolver}_{domain}_rtime'
+                           rsize_key = f'{resolver}_{domain}_size_or_error' 
+                           all_dns_info[rtime_key] = int(response_time)
+                           all_dns_info[rsize_key] = int(response_size)
  
                        except Exception as e:
                            d = None
@@ -1098,10 +1100,12 @@ class Measurements:
                            ##all_dns_info["size_or_error"].append(response_size)
                            ##all_dns_info["ping_time"].append(d)
                            ##all_dns_info["datetime"].append(datetime)
-                           rtime_key = resolver + "_" + domain + "_" + rtime 
-                           rsize_key = resolver + "_" + domain + "_" + size_or_error
-                           all_dns_info[rtime_key] = response_time
-                           all_dns_info[rsize_key] = response_size
+                           ##rtime_key = resolver + "_" + domain + "_" + rtime 
+                           ##rsize_key = resolver + "_" + domain + "_" + size_or_error
+                           rtime_key = f'{resolver}_{domain}_rtime' 
+                           rsize_key = f'{resolver}_{domain}_size_or_error'
+                           all_dns_info[rtime_key] = int(response_time)
+                           all_dns_info[rsize_key] = int(response_size)
                    else:
                        response_size = None
                        error = int(size_or_error)
@@ -1122,9 +1126,11 @@ class Measurements:
                        ##all_dns_info["size_or_error"].append(response_size)
                        ##all_dns_info["ping_time"].append(d)
                        ##all_dns_info["datetime"].append(datetime)
-                       rtime_key = resolver + "_" + domain + "_" + rtime 
-                       rsize_key =  resolver + "_" + domain + "_" + size_or_error
-                       all_dns_info[rtime_key] = response_time
+                       ##rtime_key = resolver + "_" + domain + "_" + rtime 
+                       ##rsize_key =  resolver + "_" + domain + "_" + size_or_error
+                       rtime_key = f'{resolver}_{domain}_rtime' 
+                       rsize_key = f'{resolver}_{domain}_size_or_error'
+                       all_dns_info[rtime_key] = int(response_time)
                        all_dns_info[rsize_key] = error
            except subprocess.CalledProcessError as e:
                print("CalledProcessError: {0}".format(e.output))
@@ -1132,5 +1138,5 @@ class Measurements:
                print("Exception: {0}".format(e))
            k = k+1
        self.results['resolver_measurements'] = all_dns_info
-       return output
+#       return output
        print(all_dns_info)
