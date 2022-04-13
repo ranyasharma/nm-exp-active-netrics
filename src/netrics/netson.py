@@ -1032,15 +1032,9 @@ class Measurements:
        return 0
 
     def resolver_response_time(self, key, run_test):
-#       all_dns_info = []
        all_dns_info = {}
-##       all_dns_info = {"status": [], "resolver": [], "domain": [], "rtime": [], "size_or_error": [], "ping_time": [], "datetime": []};
        k = 0
        loop = 1
-#       localtime = time.strftime("%Y%m%d-%H%M%S")
-#       a = "data_" + str(loop) + "_" + localtime + ".json"
-#       print(a)
-
        for k in range(loop):
            cmd = ["./src/netrics/dns-timing", "doh", "./src/netrics/recursors", "./src/netrics/domains"]
            try:
@@ -1054,13 +1048,14 @@ class Measurements:
                        print('Line with too many values:', line)
                    status, resolver, domain, response_time, \
                        size_or_error, datetime = line.split(',', 6)
+                   temp_resolver = resolver.replace(".", "_")[8:resolver.rfind("/")]
+                   resolver = temp_resolver
+                   temp_domain = domain.replace(".com", "")
+                   domain = temp_domain
                    if status == "ok":
                        response_size = int(size_or_error)
                        error = None
-                       temp = resolver.replace("https://", "")
-                       ping_name = temp.replace("/dns-query", "")
                        try:
-                           d = ping(ping_name, unit='ms')
                         #   all_dns_info.append({
                          #      'status': status,
                           #     'resolver': resolver,
@@ -1080,11 +1075,10 @@ class Measurements:
                            ##rsize_key = resolver + "_" + domain + "_" + size_or_error
                            rtime_key = f'{resolver}_{domain}_rtime'
                            rsize_key = f'{resolver}_{domain}_size_or_error' 
-                           all_dns_info[rtime_key] = int(response_time)
-                           all_dns_info[rsize_key] = int(response_size)
+                           all_dns_info[rtime_key] = float(response_time)
+                           all_dns_info[rsize_key] = float(response_size)
  
                        except Exception as e:
-                           d = None
                            #all_dns_info.append({
                             #   'status': status,
                             #   'resolver': resolver,
@@ -1104,8 +1098,8 @@ class Measurements:
                            ##rsize_key = resolver + "_" + domain + "_" + size_or_error
                            rtime_key = f'{resolver}_{domain}_rtime' 
                            rsize_key = f'{resolver}_{domain}_size_or_error'
-                           all_dns_info[rtime_key] = int(response_time)
-                           all_dns_info[rsize_key] = int(response_size)
+                           all_dns_info[rtime_key] = float(response_time)
+                           all_dns_info[rsize_key] = float(response_size)
                    else:
                        response_size = None
                        error = int(size_or_error)
@@ -1130,7 +1124,7 @@ class Measurements:
                        ##rsize_key =  resolver + "_" + domain + "_" + size_or_error
                        rtime_key = f'{resolver}_{domain}_rtime' 
                        rsize_key = f'{resolver}_{domain}_size_or_error'
-                       all_dns_info[rtime_key] = int(response_time)
+                       all_dns_info[rtime_key] = response_time
                        all_dns_info[rsize_key] = error
            except subprocess.CalledProcessError as e:
                print("CalledProcessError: {0}".format(e.output))
@@ -1138,5 +1132,5 @@ class Measurements:
                print("Exception: {0}".format(e))
            k = k+1
        self.results['resolver_measurements'] = all_dns_info
-#       return output
+       return output
        print(all_dns_info)
