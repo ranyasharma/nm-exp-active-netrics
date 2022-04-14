@@ -1049,6 +1049,8 @@ class Measurements:
                    status, resolver, domain, response_time, \
                        size_or_error, datetime = line.split(',', 6)
                    temp_resolver = resolver.replace(".", "_")[8:resolver.rfind("/")]
+                   temp_resolver = temp_resolver.replace("/", "")
+                   temp_resolver = temp_resolver.replace("-", "_")
                    resolver = temp_resolver
                    temp_domain = domain.replace(".com", "")
                    domain = temp_domain
@@ -1103,8 +1105,7 @@ class Measurements:
                    else:
                        response_size = None
                        error = int(size_or_error)
-                       response_time = None
-                       d = None
+                       response_time = -1
                        #all_dns_info.append({
                         #   'status': status,
                         #   'resolver': resolver,
