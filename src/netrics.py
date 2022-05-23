@@ -9,7 +9,8 @@ from netrics.netson import Measurements
 from nmexpactive.experiment import NetMicroscopeControl
 
 from influxdb_client.client.write_api import SYNCHRONOUS
-from influxdb import InfluxDBClient
+#from influxdb import InfluxDBClient
+from influxdb_client import InfluxDBClient
 
 log = logging.getLogger(__name__)
 
@@ -210,28 +211,40 @@ def upload(upload_results, measurements):
 
     if not upload_results:
         return
+    url = os.getenv("INFLUX_URL")
+    token = os.getenv("INFLUX_TOKEN")
+    org = os.getenv("INFLUX_ORG")
+    bucket = os.getenv("INFLUX_BUCKET")
 
-    server = None
-    port = 0
-    username = None
-    password = None
-    installid = None
-
-    server = os.getenv("INFLUXDB_SERVER")
-    port = os.getenv("INFLUXDB_PORT")
-    username = os.getenv("INFLUXDB_USERNAME")
-    password = os.getenv("INFLUXDB_PASSWORD")
-    db = os.getenv("INFLUXDB_DATABASE")
-    installid = os.getenv("INSTALL_ID")
-
-    if server is None:
+    if url is None:
         log.error("Unable to insert data (influxdb), missing .env or INFLUXDB_* not set.")
         print(("Unable to insert data (influxdb), missing .env or INFLUXDB_* not set."))
         return
- 
-    creds = InfluxDBClient(host=server, port=port, username=username,
-                password=password, database=db, ssl=True, verify_ssl=True)
 
+   # server = None
+   # port = 0
+   # username = None
+   # password = None
+   # installid = None
+
+   # server = os.getenv("INFLUXDB_SERVER")
+   # port = os.getenv("INFLUXDB_PORT")
+   # username = os.getenv("INFLUXDB_USERNAME")
+   # password = os.getenv("INFLUXDB_PASSWORD")
+   # db = os.getenv("INFLUXDB_DATABASE")
+   # installid = os.getenv("INSTALL_ID")
+
+   # if server is None:
+   #     log.error("Unable to insert data (influxdb), missing .env or INFLUXDB_* not set.")
+   #     print(("Unable to insert data (influxdb), missing .env or INFLUXDB_* not set."))
+   #     return
+ 
+#    creds = InfluxDBClient(host=server, port=port, username=username,
+ #               password=password, database=db, ssl=True, verify_ssl=True)
+
+    creds = InfluxDBClient(url=url, token=token, org=org)
+    write_api = creds.write_api(write_options=SYNCHRONOUS)
+    
     insert = {}
     for m in measurements.keys():
         if m != 'ipquery':
@@ -246,16 +259,22 @@ def upload(upload_results, measurements):
 
     #print("---> {}".format(insert))
 
-    ret = creds.write_points([{"measurement": "networks",
-                         "tags"        : {"install": installid},
-                         "fields"      : insert,
-                         "time"        : datetime.utcnow()}])
-    if not ret:
+    # ret = creds.write_points([{"measurement": "networks",
+      #                   "tags"        : {"install": installid},
+       #                  "fields"      : insert,
+        #                 "time"        : datetime.utcnow()}])
+   # if not ret:
+   #     log.error("influxdb write_points return: false")
+   #     print("influxdb write_points return: false")
+    #    return
+   # log.info("influxdb write_points return: OK")
+    try:
+        write_api.write(bucket=bucket, record=[{"measurement": "networks", "fields": insert, "time": datetime.utcnow()}])
+    except:
         log.error("influxdb write_points return: false")
         print("influxdb write_points return: false")
         return
     log.info("influxdb write_points return: OK")
- 
 
 def check_connectivity(res, site):
 
