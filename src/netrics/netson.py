@@ -30,8 +30,9 @@ class Measurements:
         self.quiet = args.quiet
 
         self.sites = list(self.nma.conf['reference_site_dict'].keys())
+	self.resolvers = list(self.nma.conf['encrypted_dns'].keys())
         self.labels = self.nma.conf['reference_site_dict']
-
+	self.res_labels = self.nma.conf['encrypted_dns']
         self.measured_down = 5
         self.max_monthly_consumption_gb = 200
         self.max_monthly_tests = 200
@@ -730,6 +731,57 @@ class Measurements:
 
             dig_res_qt = re.findall('Query time: ([0-9]*) msec',
                                  dig_res[label], re.MULTILINE)[0]
+            dig_delays.append(int(dig_res_qt))
+
+        self.results[key] = {}
+        self.results[key]["dns_query_avg_ms"] = sum(dig_delays) / len(dig_delays)
+        self.results[key]["dns_query_max_ms"] = max(dig_delays)
+        self.results[key]["error"] = error_found
+
+        if not self.quiet:
+            print(f'\n --- DNS Delays (n = {len(dig_delays)}) ---')
+            print(f'Avg DNS Query Time: {self.results[key]["dns_query_avg_ms"]} ms')
+            print(f'Max DNS Query Time: {self.results[key]["dns_query_max_ms"]} ms')
+
+        return dig_res
+
+    def encrypted_dns(self, key, run_test):
+        """
+        Method records dig latency for each site in self.sites
+        """
+        """ key: test name """
+
+        if not run_test:
+            return
+
+        dig_res = None
+        error_found = False
+        target = 'www.google.com'
+
+        #if 'target' in self.nma.conf['dns_latency'].keys():
+        #    target = self.nma.conf['dns_latency']['target']
+
+        dig_delays = []
+        dig_res = {}
+        for resolver in self.resolvers:
+
+            try:
+               res_label = self.res_labels[resolver]
+            except KeyError:
+               res_label = resolver
+
+            dig_cmd = f'dig +https @{resolver} {target} A'
+            dig_res[res_label], err = self.popen_exec(dig_cmd)
+            if len(err) > 0:
+               print(f"ERROR: {err}")
+               self.results[key][f'{res_label}_error'] = f'{err}'
+               dir_res[res_label] = { 'error': f'{err}' }
+               log.error(err)
+               error_found = True
+               continue
+
+            dig_res_qt = re.findall('Query time: ([0-9]*) msec',
+                                 dig_res[res_label], re.MULTILINE)[0]
             dig_delays.append(int(dig_res_qt))
 
         self.results[key] = {}
