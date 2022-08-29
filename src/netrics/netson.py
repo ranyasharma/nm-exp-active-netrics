@@ -770,7 +770,7 @@ class Measurements:
             except KeyError:
                res_label = resolver
 
-            dig_cmd = f'dig +https @{resolver} {target} A'
+            dig_cmd = f'/usr/local/dig/bin/dig +https @{resolver} {target}'
             dig_res[res_label], err = self.popen_exec(dig_cmd)
             if len(err) > 0:
                print(f"ERROR: {err}")

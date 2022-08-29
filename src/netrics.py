@@ -94,6 +94,12 @@ def build_parser():
     )
 
     parser.add_argument(
+            '--doh',
+            default=False,
+            action='store_true',
+            help='Measure DoH resolvers'
+    )
+    parser.add_argument(
             '-t', '--target',
             default=False,
             action='store_true',
